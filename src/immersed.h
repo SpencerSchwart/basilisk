@@ -6,13 +6,22 @@ face vector bf[];
 
 face vector aF[]; // body force acceleration term
 
+
 event acceleration (i++) {
   foreach_face() {
     // double ff = (airfoilsf[] + airfoilsf[-1])/2;
-    aF.x[] += face_value(airfoil,0)*(vc.x-face_value(u.x, 0))/(dt);
+    aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x, 0))/(dt);
     // bf.x[] += sf.x[]*(vc.x-face_value(u.x, 0))/(dt);
   }
   a = aF;
+}
+
+event end_timestep (i++) {
+  correction (-dt);
+  foreach_face()
+    aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x,0))/(dt);
+  a = aF;
+  correction (dt);
 }
 
 void imersed_force (scalar c, coord * F) {

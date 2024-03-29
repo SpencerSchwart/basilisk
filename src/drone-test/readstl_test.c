@@ -1,4 +1,4 @@
-// #include "grid/octree.h"
+#include "grid/octree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "utils.h"
@@ -28,7 +28,11 @@ pf[right] = neumann(0.);
 
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
-			
+
+// 3D
+// u.n[front] = dirichlet(0);
+// p[front] = dirichlet(0);
+
 
 void fraction_from_stl (scalar cs, face vector fs, FILE * fp) {
   coord * p = input_stl (fp); // import CAD
@@ -92,16 +96,17 @@ event init (t = 0) {
   */
 
   // && abs(z) <= (h/2) && cs[] < 1
+//      if (abs(x) <= D/2 && abs(y) <= D/2)
+//	if (sq(x) + sq(y) < sq(D/2)) 
 
-  foreach()
+   foreach()
     {
-      if (abs(x) <= D/2 && abs(y) <= D/2)
-	if (sq(x) + sq(y) < sq(D/2)) {
-	  theta = atan(y/x);
-	  r = sqrt(sq(x) + sq(y));
-	  u.x[] = x > 0? -1*r*omega*sin(theta):r*omega*sin(theta);
-	  u.y[] = x > 0? r*omega*cos(theta): -1*r*omega*cos(theta);
-	}
+	theta = atan(y/x);
+	
+	r = sqrt(sq(x) + sq(y));
+	u.x[] = x > 0? -1*r*omega*sin(theta):r*omega*sin(theta);
+	u.y[] = x > 0? r*omega*cos(theta): -1*r*omega*cos(theta);
+	u.z[] = 0.;
     }
   
 }
@@ -121,7 +126,7 @@ event properties (i++) {
   boundary ((scalar *) {muv});
   */
 
-  
+ /* 
   foreach_boundary(bottom) {
     theta = atan(y/x);
     r = sqrt(sq(x) + sq(y));
@@ -142,11 +147,16 @@ event properties (i++) {
   }
   foreach_boundary(right) {
     theta = atan(y/x);
+    u.x[] = x > 0? -1*r*omega*sin(theta):r*omega*sin(theta);
+    u.y[] = x > 0? r*omega*cos(theta): -1*r*omega*cos(theta);
+  }
+  foreach_boundary(right) {
+    theta = atan(y/x);
     r = sqrt(sq(x) + sq(y));
     u.x[] = x > 0? -1*r*omega*sin(theta):r*omega*sin(theta);
     u.y[] = x > 0? r*omega*cos(theta): -1*r*omega*cos(theta);
   }
-
+*/
 }
 
 event logfile (i++, t <= 5) {
@@ -156,6 +166,22 @@ event logfile (i++, t <= 5) {
   embed_force (p, u, mu, &Fp, &Fmu);
   double CD = (Fp.x + Fmu.x)/(0.5*sq(omega*D/2)*3.1415*sq(D/2));
   double CL = (Fp.y + Fmu.y)/(0.5*sq(omega*D/2)*3.1415*sq(D/2));
+  */
+ /*
+  double E = 0; 
+  boundary ({u.x, u.y});
+  scalar omegav[];
+  vorticity (u , omegav);
+  foreach(){
+    double vort = omegav[];
+    double area = dv();
+    if (cs[] < 1. && cs[] > 0){
+      coord b, n;
+      area *= embed_geometry (point, &b, &n);
+      vort = embed_vorticity (point, u, b, n);
+    }
+    E += area*sq(vort);
+  }
   */
   fprintf (stderr, "%d %g %g %g\n", i, t);
 }
@@ -176,8 +202,3 @@ event graphics (i = 0)
 event adapt (i++) {
   double uemax = 0.001;
   adapt_wavelet ({cs,u},
-		 (double[]){0.01,uemax,uemax,uemax}, LEVEL, 5);
-}
-
-
-

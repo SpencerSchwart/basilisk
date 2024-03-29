@@ -138,7 +138,7 @@ event movie (t += 0.01; t <= t_end)
 }
 
 scalar psi[];
-event snapshot (t += 2.5, t <= t_end)
+event snapshot (t += 5, t <= t_end)
 {
   
   scalar omega[];
@@ -192,7 +192,7 @@ event snapshot (t += 2.5, t <= t_end)
   view (fov = 2, tx = -0.375, ty = -0.20,
 	width = 800, height = 400); 
   isoline ("omega", n = 15, min = -3, max = 3);
-  draw_vof ("cs", "fs", filled = 1, lw = 5);
+  draw_vof ("cs", "fs", filled = -1, lw = 5);
   save (fp = fp4);
 }
 

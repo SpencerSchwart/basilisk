@@ -1,8 +1,9 @@
 #include "embed.h"
 #undef EMBED
 #include "navier-stokes/centered.h"
-#include "immersed.h" // IBM
-#include "interfaceforce.h" // for CD and CL
+#include "navier-stokes/double-projection.h"
+#include "../immersed.h" // IBM
+#include "../interfaceforce.h" // for CD and CL
 #include "curvature.h"
 #include "view.h"
 #include "tracer.h"
@@ -35,9 +36,9 @@ p[right]   = dirichlet (0);
 pf[right]  = dirichlet (0);
 
 u.n[top] = neumann (0);
-// p[top] = dirichlet (0);
+p[top] = neumann (0);
 u.n[bottom] = neumann (0);
-// p[bottom] = dirichlet (0);
+p[bottom] = neumann (0);
 
 vector nv[];
 void normal_vector (scalar s) {
@@ -92,7 +93,7 @@ int main() {
 scalar test[];
 event moving_cylinder (i++) {
   solid (airfoil, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
-  /*
+
   solid (test, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
   int k;
   double vof;
@@ -113,7 +114,7 @@ event moving_cylinder (i++) {
       //       nv.x[], nv.y[], lambda, eta, vof, x, y, Delta);
     }
   }
-  */
+
 }
 
 event init (t = 0) {
