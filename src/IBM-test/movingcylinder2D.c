@@ -1,7 +1,7 @@
 #include "embed.h"
 #undef EMBED
-#include "navier-stokes/centered.h"
-#include "navier-stokes/double-projection.h"
+#include "../centered2.h"
+#include "../double-projection2.h"
 #include "../immersed.h" // IBM
 #include "../interfaceforce.h" // for CD and CL
 #include "curvature.h"
@@ -17,7 +17,10 @@ double U0 =  1.0; // inlet velocity
 coord ci = {5, 3}; // initial coordinates of airfoil
 coord vc = {0, 0};
 int j;
-double t_end = 15 [0,1];
+double t_end = 25 [0,1];
+
+double xi = 4.8266;
+double yi = 3.0835;
 
 scalar f[];
 scalar * tracers = {f};
@@ -64,7 +67,7 @@ int main() {
   mu = muv; 
   
   j = 0;
-  Re = 1.;
+  Re = 40.;
   run();
 
   j++;

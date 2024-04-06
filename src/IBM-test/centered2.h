@@ -53,6 +53,9 @@ extern scalar airfoil;
 extern coord vc;
 extern face vector aF;
 extern face vector bf;
+extern face vector Af;
+extern scalar dp;
+
 /**
 In the case of variable density, the user will need to define both the
 face and centered specific volume fields ($\alpha$ and $\alpha_c$
@@ -78,6 +81,16 @@ for which inertia is negligible compared to viscosity. */
 (const) scalar rho = unity;
 mgstats mgp = {0}, mgpf = {0}, mgu = {0};
 bool stokes = false;
+
+
+extern double xi, yi;
+
+void output(int i, double t, int j, double dt) {
+  foreach() {
+    if (x > xi*0.999 && x < xi*1.001 && y > yi*0.999 && y < yi*1.001)
+      fprintf (stderr, "i=%d t=%g j=%d vof=%g u.x=%g u.y=%g uf.x=%g uf.y=%g p=%g g.x=%g g.y= %g a.x=%g a.y=%g aF.x=%g aF.y=%g Af.x=%g Af.y=%g dp=%g \n", i, t, j, airfoil[], u.x[], u.y[], uf.x[], uf.y[], p[], g.x[], g.y[], a.x[], a.y[], aF.x[], aF.y[], Af.x[], Af.y[], dp[]);
+  }
+}
 
 /**
 ## Boundary conditions
@@ -322,11 +335,15 @@ field. */
 
 event advection_term (i++,last)
 {
+  output (i, t, 3, dt);
   if (!stokes) {
     prediction();
+    output (i, t, 4, dt);
     mgpf = project (uf, pf, alpha, dt/2., mgpf.nrelax);
+    output (i, t, 5, dt);
     advection ((scalar *){u}, uf, dt, (scalar *){g});
   }
+  output (i, t, 6, dt);
 }
 
 /**
@@ -351,12 +368,13 @@ time $t+\Delta t$. */
 
 event viscous_term (i++,last)
 {
+  output (i, t, 7, dt);
   if (constant(mu.x) != 0.) {
     correction (dt);
     mgu = viscosity (u, mu, rho, dt, mgu.nrelax);
     correction (-dt);
   }
-
+  output (i, t, 8, dt);
   /**
   We reset the acceleration field (if it is not a constant). */
 
@@ -366,6 +384,7 @@ event viscous_term (i++,last)
     foreach_face()
       af.x[] = 0.;
   }
+  output (i, t, 9, dt);
 }
 
 /**
@@ -387,9 +406,11 @@ acceleration term is added. */
 
 event acceleration (i++,last)
 {
+  output (i, t, 14, dt);
   trash ({uf});
   foreach_face()
     uf.x[] = fm.x[]*(face_value (u.x, 0) + dt*a.x[]);
+  output (i, t, 15, dt);
 }
 
 /**
@@ -427,8 +448,11 @@ next timestep). Then compute the centered gradient field *g*. */
 
 event projection (i++,last)
 {
+  output (i, t, 18, dt);
   mgp = project (uf, p, alpha, dt, mgp.nrelax);
+  output (i, t, 19, dt);
   centered_gradient (p, g);
+  output (i, t, 20, dt);
 
   /**
   We add the gradient field *g* to the centered velocity field. */
@@ -438,6 +462,7 @@ event projection (i++,last)
   a = aF;
 */
   correction (dt);
+  output (i, t, 21, dt);
 }
 
 /**

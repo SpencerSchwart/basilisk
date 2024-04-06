@@ -8,19 +8,20 @@ face vector aF[]; // body force acceleration term
 
 
 event acceleration (i++) {
-  foreach_face() {
-    // double ff = (airfoilsf[] + airfoilsf[-1])/2;
-    aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x, 0))/(dt);
-    // bf.x[] += sf.x[]*(vc.x-face_value(u.x, 0))/(dt);
-  }
+  output (i, t, 10, dt);
+  foreach_face()
+    aF.x[] = sf.x[]*(vc.x-face_value(u.x, 0))/(dt);
   a = aF;
+  output (i, t, 11, dt);
 }
 
 event end_timestep (i++) {
+  output (i, t, 22, dt);
   correction (-dt);
   foreach_face()
-    aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x,0))/(dt);
+    aF.x[] = sf.x[]*(vc.x-face_value(u.x,0))/(dt);
   a = aF;
+  output (i, t, 23, dt);
   correction (dt);
 }
 
