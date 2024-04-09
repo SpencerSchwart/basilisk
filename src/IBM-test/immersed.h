@@ -20,14 +20,14 @@ event acceleration (i++) {
 
 event end_timestep (i++) {
   output (i, t, 22, dt);
-  correction (-dt);
+  //correction (-dt);
   foreach_face()
     aF.x[] = sf.x[]*(vc.x-face_value(u.x,0))/(dt);
   a = aF;
+  //correction (dt);
   output (i, t, 23, dt);
-  correction (dt);
 }
-
+/*
 void imersed_force (scalar c, coord * F) {
 
   coord Fi = {0}; // intermediate force
@@ -49,6 +49,6 @@ void imersed_force (scalar c, coord * F) {
 
 
 
-
+*/
 
 #endif

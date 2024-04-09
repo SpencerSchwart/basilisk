@@ -1,0 +1,16 @@
+./../interfaceforce.h:140: warning: stencils: cannot analyze point function pointers
+.qccPlI5Jn/movingcylinder2D.c:1:7: warning: line number out of range
+movingcylinder2D-cpp.c: warning: line number out of range
+<built-in>: warning: line number out of range
+/usr/include/stdc-predef.h:1:7: warning: line number out of range
+./../interfaceforce.h: In function ‘interface_force’:
+./../interfaceforce.h:185:9: error: ‘Fps’ undeclared (first use in this function); did you mean ‘Fp’?
+./../interfaceforce.h:185:9: note: each undeclared identifier is reported only once for each function it appears in
+./../interfaceforce.h:185:21: error: ‘Fmus’ undeclared (first use in this function); did you mean ‘Fmu’?
+movingcylinder2D.c: In function ‘moving_cylinder’:
+movingcylinder2D.c:107:14: warning: variable ‘vof’ set but not used [-Wunused-but-set-variable]
+movingcylinder2D.c: In function ‘logfile’:
+movingcylinder2D.c:168:12: warning: variable ‘vort’ set but not used [-Wunused-but-set-variable]
+movingcylinder2D.c:168:12: warning: variable ‘vort’ set but not used [-Wunused-but-set-variable]
+./../interfaceforce.h: In function ‘interface_force’:
+./../interfaceforce.h:186:1: warning: control reaches end of non-void function [-Wreturn-type]

@@ -1,0 +1,9 @@
+.qccBOKJTA/readstl_test.c:1:7: warning: line number out of range
+readstl_test-cpp.c: warning: line number out of range
+<built-in>: warning: line number out of range
+/usr/include/stdc-predef.h:1:7: warning: line number out of range
+readstl_test.c: In function ‘logfile’:
+readstl_test.c:172:18: warning: format ‘%g’ expects a matching ‘double’ argument [-Wformat=]
+readstl_test.c:172:18: warning: format ‘%g’ expects a matching ‘double’ argument [-Wformat=]
+readstl_test.c: In function ‘adapt_0’:
+readstl_test.c:192:10: warning: unused variable ‘uemax’ [-Wunused-variable]

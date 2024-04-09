@@ -1,0 +1,10 @@
+0 0
+1 4.69208e-05
+2 0.000146452
+3 0.000217854
+4 0.000247055
+5 0.000276431
+6 0.000306076
+/home/spencer/basilisk/src/grid/multigrid-common.h:54:error: [Thread debugging using libthread_db enabled]
+/home/spencer/basilisk/src/grid/multigrid-common.h:54:error: Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+/home/spencer/basilisk/src/grid/multigrid-common.h:54:error: Program received signal SIGINT, Interrupt.

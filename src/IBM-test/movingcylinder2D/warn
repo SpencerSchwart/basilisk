@@ -1,9 +1,0 @@
-./../interfaceforce.h:140: warning: stencils: cannot analyze point function pointers
-.qccu9eMED/movingcylinder2D.c:1:7: warning: line number out of range
-movingcylinder2D-cpp.c: warning: line number out of range
-<built-in>: warning: line number out of range
-/usr/include/stdc-predef.h:1:7: warning: line number out of range
-movingcylinder2D.c: In function ‘moving_cylinder’:
-movingcylinder2D.c:102:10: warning: variable ‘vof’ set but not used [-Wunused-but-set-variable]
-./../interfaceforce.h: In function ‘interface_force’:
-./../interfaceforce.h:185:1: warning: control reaches end of non-void function [-Wreturn-type]

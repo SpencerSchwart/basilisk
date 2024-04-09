@@ -155,15 +155,16 @@ coord embed_gradiento (Point point, vector u, coord p, coord n)
 double interface_force (scalar c, scalar p, vector u,
 			face vector mu, coord * Fp, coord * Fmu)
 {
-  double Fn = 0.;
-  coord Fps = {0}, Fmus = {0};
+  // double Fn = 0.;
+
   foreach ()
     if (c[] > 1e-6 && c[] < 1. - 1e-6) {
+      coord Fps = {0}, Fmus = {0};
       coord n, b;
       double area = embed_geometryo (point, &b, &n);
       area *= pow (Delta, dimension - 1);
 
-      Fn = area*embed_interpolateo (point, p, b);
+      double Fn = area*embed_interpolateo (point, p, b);
       foreach_dimension()
 	Fps.x -= Fn*n.x;
 

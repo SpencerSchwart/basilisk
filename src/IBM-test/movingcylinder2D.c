@@ -17,7 +17,7 @@ double U0 =  1.0; // inlet velocity
 coord ci = {5, 3}; // initial coordinates of airfoil
 coord vc = {0, 0};
 int j;
-double t_end = 25 [0,1];
+double t_end = 20 [0,1];
 
 double xi = 4.8266;
 double yi = 3.0835;
@@ -67,7 +67,7 @@ int main() {
   mu = muv; 
   
   j = 0;
-  Re = 40.;
+  Re = 1.;
   run();
 
   j++;
@@ -98,15 +98,13 @@ event moving_cylinder (i++) {
   solid (airfoil, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
 
   solid (test, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
-  int k;
-  double vof;
   foreach() {
     if (airfoil[] > 0 && airfoil[] < 1) {
       normal_vector(airfoil);
       double lambda = fabs(nv.x[]) + fabs(nv.y[]);
       double eta = 0.065*(1 - sq(lambda)) + 0.39;
-      k = 1;
-      vof = airfoil[];
+      double k = 1;
+      double vof = airfoil[];
       // fprintf (stderr, "alpha k=%d i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof=%g x=%g y=%g delta=%g\n",k,i,t,
       //       nv.x[], nv.y[], lambda, eta, vof, x, y, Delta);
       airfoil[] = 0.5*(1 - tanh ((sqrt(sq(x - ci.x) + sq(y - ci.y)) - (D/2))/
@@ -161,8 +159,8 @@ event logfile (i++){
   interface_force (airfoil, p, u, mu, &Fp, &Fmu);
   double CD = (Fp.x + Fmu.x)/(0.5*sq(U0)*(D));
   double CL = (Fp.y + Fmu.y)/(0.5*sq(U0)*(D));
-
-  double E = 0; 
+ 
+  double E = 0;
   boundary ({u.x, u.y});
   scalar omega[];
   vorticity (u , omega);
@@ -174,7 +172,7 @@ event logfile (i++){
       area *= embed_geometryo (point, &b, &n);
       vort = embed_vorticityo (point, u, b, n);
     }
-    E += area*sq(vort);
+    // E += area*sq(vort);
   }
   
   fprintf (stderr, "%d %g %d %d %d %d %d %g %g %g\n",

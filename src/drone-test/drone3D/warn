@@ -1,0 +1,6 @@
+.qccc5pJJ1/drone3D.c:1:7: warning: line number out of range
+drone3D-cpp.c: warning: line number out of range
+<built-in>: warning: line number out of range
+/usr/include/stdc-predef.h:1:7: warning: line number out of range
+drone3D.c: In function ‘adapt_0’:
+drone3D.c:161:10: warning: unused variable ‘uemax’ [-Wunused-variable]
