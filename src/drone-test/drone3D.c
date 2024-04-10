@@ -11,7 +11,7 @@ double D = 4.6; // prop diameter
 double h = 0.175; // prop height
 double Re = 600000;
 double U0 = 1.;
-double omega = 100. [0, -1];// prop rotational speed
+double omega = 10. [0, -1];// prop rotational speed
 face vector muv[];
 
 
@@ -36,6 +36,7 @@ void fraction_from_stl (scalar s, face vector fv, FILE * fp) {
   }
   fractions (phi, s, fv);
   fractions_cleanup (s, fv);
+  
 }
 
 
@@ -50,7 +51,7 @@ int main() {
 
 
 event init (t = 0) {
-/*
+
   if (!restore (file = "restart")) {
     FILE * fp = fopen ("/home/spencer/basilisk/CTFL/files/prop_test5.stl", "r");
     if (fp == NULL)
@@ -65,6 +66,21 @@ event init (t = 0) {
       fclose (fp);
     }
   }
+  /*
+  FILE * cs_cad = fopen ("cs-points.txt", "w");
+  FILE * fsx_cad = fopen ("fsx-points.txt", "w");
+  FILE * fsy_cad = fopen ("fsy-points.txt", "w");
+
+  foreach()
+    if(cs[] > 0 && cs[] < 1) {
+      fprintf (cs_cad,"%g %g %g %g\n", x, y, z, cs[]);
+      fprintf (fsx_cad,"%g %g %g %g\n", x, y, z, fs.x[]);
+      fprintf (fsy_cad,"%g %g %g %g\n", x, y, z, fs.y[]);
+    }
+
+  fclose (cs_cad);
+  fclose (fsx_cad);
+  fclose (fsy_cad);
   */
   foreach() {
     double theta = atan(y/x);
@@ -151,6 +167,13 @@ event acceleration (i++) {
 
 
 event logfile (i++, t <= 5) {
+
+/*
+  coord Fp, Fmu;
+  embed_force (p, u, mu, &Fp, &Fmu);
+  double CD = (Fp.x + Fmu.x)/(0.5*sq(omega*D/2)*3.1415*sq(D/2));
+  double CL = (Fp.y + Fmu.y)/(0.5*sq(omega*D/2)*3.1415*sq(D/2));
+*/
   fprintf (stderr, "%d %g\n", i, t);
 }
 

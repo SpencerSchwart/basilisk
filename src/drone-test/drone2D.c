@@ -9,7 +9,6 @@ double D = 4.6; // prop diameter
 double h = 0.175; // prop height
 double Re = 600000;
 double U0 = 1.;
-// double theta, r;
 double omega = 10. [0, -1];// prop rotational speed
 face vector muv[];
 
@@ -24,7 +23,6 @@ u.t[left]    = dirichlet( omega*fabs(y));
 u.t[top]     = dirichlet( omega*fabs(x));
 u.t[bottom]  = dirichlet(-omega*fabs(x));
 
-/*
 uf.n[right]   = dirichlet( omega*y);
 uf.n[left]    = dirichlet( omega*y);
 uf.n[top]     = dirichlet(-omega*x);
@@ -34,17 +32,20 @@ uf.t[right]   = dirichlet(-omega*x);
 uf.t[left]    = dirichlet(-omega*x);
 uf.t[top]     = dirichlet( omega*y);
 uf.t[bottom]  = dirichlet( omega*y);
-*/
+
 u.n[embed]    = dirichlet(0);
 u.t[embed]    = dirichlet(0);
 
-/*
-scalar psi[];
-psi[right]  = dirichlet(-0.5*omega*(sq(x) + sq(y)));
-psi[left]   = dirichlet(-0.5*omega*(sq(x) + sq(y)));
-psi[top]    = dirichlet(-0.5*omega*(sq(x) + sq(y)));
-psi[bottom] = dirichlet(-0.5*omega*(sq(x) + sq(y)));
-*/
+p[right]      = neumann (0);
+p[left]       = neumann (0);
+p[top]        = neumann (0);
+p[bottom]     = neumann (0);
+
+pf[right]     = neumann (0);
+pf[left]      = neumann (0);
+pf[top]       = neumann (0);
+pf[bottom]    = neumann (0);
+
 
 void fraction_from_stl (scalar cs, face vector fs, FILE * fp) {
   coord * p = input_stl (fp); // import CAD
@@ -89,15 +90,15 @@ event init (t = 0) {
     fclose (fp);
   }
   */
-/* 
+ /*
   vertex scalar phi[];
   foreach_vertex() {
-    phi[] = fabs(x) < 0.25 && fabs(y) < 1? 0:1;	  
+    phi[] = fabs(x) < 0.1 && fabs(y) < 1? 0:1;	  
   }
   boundary ({phi});
   fractions (phi, cs, fs);
   fractions_cleanup (cs, fs);
-  */
+*/
    foreach()
     {
 	double theta = atan(y/x);
