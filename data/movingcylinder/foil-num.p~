@@ -1,0 +1,14 @@
+set term pngcairo size 800,800 enhanced
+set output 're-40.png'
+set size ratio 0.8
+set xrange [0:15]
+set yrange [0:35]
+
+set title "Re = 40" font ",16"
+set xlabel "time" font ",14"
+set ylabel "Enstrophy" font ",14"
+set tics font ",12"
+
+
+plot 'loge' u 2:($3==2?$10:NaN) w l t 'IBM smeared' lw 3, 'loge1' u 2:($3==2?$10:NaN) w l t 'IBM' lw 3, 'loge2' u 2:($3==2?$10:NaN) w l t 'very simple IBM' lw 3, 'loge3' u 2:($3==2?$10:NaN) w l t 'embed' lw 3
+

@@ -1,0 +1,21 @@
+set term pngcairo size 800,800 enhanced
+set output 'pressure_contours_with_airfoil5.png'
+set size ratio -1
+set view map
+
+
+set xrange [4.6:5.4]
+set yrange [9.8:10.5]
+
+unset key
+
+set contour base
+set cntrparam levels auto 100
+set cntrlabel onecolor
+
+set style textbox opaque noborder
+
+splot '5-p-contours-12.5.txt' u 1:2:3 w l nosurface lc rgb "black", 'p-contours-2.6.txt' u 1:2:3 w labels boxed notitle, 'out-facets' u 1:2:(0) w l lc rgb "red"
+
+
+show output

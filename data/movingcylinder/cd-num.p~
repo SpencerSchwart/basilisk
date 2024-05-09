@@ -1,0 +1,14 @@
+set term pngcairo size 900,900 enhanced
+set output 'cd-10.png'
+set size ratio 0.8
+set xrange [0:15]
+set yrange [0:5]
+
+set title "Re = 10" font ",16"
+set xlabel "time" font ",14"
+set ylabel "CD" font ",14"
+set tics font ",12"
+
+
+plot 'loge' u 2:($3==0?$8:NaN) t 'IBM smeared', 'loge1' u 2:($3==0?$8:NaN) t 'IBM' , 'loge2' u 2:($3==0?$8:NaN) t 'very simple IBM' , 'loge3' u 2:($3==0?$8:NaN) t 'embed'
+
