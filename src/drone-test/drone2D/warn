@@ -1,6 +1,7 @@
-.qccUR2gDA/drone2D.c:1:7: warning: line number out of range
+.qccKxO0Pq/drone2D.c:1:7: warning: line number out of range
 drone2D-cpp.c: warning: line number out of range
 <built-in>: warning: line number out of range
 /usr/include/stdc-predef.h:1:7: warning: line number out of range
-drone2D.c: In function ‘adapt_0’:
-drone2D.c:178:10: warning: unused variable ‘uemax’ [-Wunused-variable]
+drone2D.c: In function ‘logfile’:
+drone2D.c:150:10: warning: unused variable ‘CL’ [-Wunused-variable]
+drone2D.c:149:10: warning: unused variable ‘CD’ [-Wunused-variable]

@@ -1,5 +1,5 @@
-#ifndef BASILISK_HEADER_26
-#define BASILISK_HEADER_26
+#ifndef BASILISK_HEADER_25
+#define BASILISK_HEADER_25
 #line 1 "./../double-projection2.h"
 /**
 # Double projection

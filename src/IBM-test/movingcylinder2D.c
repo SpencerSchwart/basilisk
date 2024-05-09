@@ -1,7 +1,7 @@
 #include "embed.h"
 #undef EMBED
-#include "../centered2.h"
-#include "../double-projection2.h"
+#include "navier-stokes/centered.h"
+#include "navier-stokes/double-projection.h"
 #include "../immersed.h" // IBM
 #include "../interfaceforce.h" // for CD and CL
 #include "curvature.h"
@@ -43,8 +43,7 @@ p[top] = neumann (0);
 u.n[bottom] = neumann (0);
 p[bottom] = neumann (0);
 
-vector nv[];
-void normal_vector (scalar s) {
+void normal_vector (scalar s, vector nv) {
   foreach()
     foreach_dimension()
       nv.x[] = (s[1] - s[-1])/(2.*Delta);
@@ -67,9 +66,9 @@ int main() {
   mu = muv; 
   
   j = 0;
-  Re = 1.;
+  Re = 40.;
   run();
-
+/*
   j++;
   Re = 2.;
   run();
@@ -89,33 +88,40 @@ int main() {
   j++;
   Re = 40.;
   run();
-  
+  */
 }
 
-
-scalar test[];
+scalar reference[];
+face vector rf[];
 event moving_cylinder (i++) {
   solid (airfoil, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
-
-  solid (test, sf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
+  solid (reference, rf, - sq(x - ci.x) - sq(y - ci.y) + sq(D/2));
+  /*
+  foreach()
+    foreach_dimension()
+      u.x[] = airfoil[]*vc.x + (1. - airfoil[])*u.x[];
+  boundary ((scalar *){u});
+  */
+ 
   foreach() {
     if (airfoil[] > 0 && airfoil[] < 1) {
-      normal_vector(airfoil);
+      vector nv[];
+      normal_vector(reference, nv);
       double lambda = fabs(nv.x[]) + fabs(nv.y[]);
       double eta = 0.065*(1 - sq(lambda)) + 0.39;
       double k = 1;
       double vof = airfoil[];
-      // fprintf (stderr, "alpha k=%d i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof=%g x=%g y=%g delta=%g\n",k,i,t,
-      //       nv.x[], nv.y[], lambda, eta, vof, x, y, Delta);
-      airfoil[] = 0.5*(1 - tanh ((sqrt(sq(x - ci.x) + sq(y - ci.y)) - (D/2))/
-      				 (lambda * eta * sqrt(2) * Delta)));
+      double num = sqrt(sq(x - ci.x) + sq(y - ci.y)) - (D/2);
+      //fprintf (stderr, "alpha i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof=%g x=%g y=%g delta=%g num=%g\n",i,t,
+      //         nv.x[], nv.y[], lambda, eta, vof, x, y, Delta, num);
+     //airfoil[] = 0.5 * (1 - tanh (reference[] / (lambda * eta * sqrt(2) * Delta)));
+     airfoil[] = 0.5*(1 - tanh ( num / (lambda * eta * sqrt(2) * Delta)));
       k++;
       vof = airfoil[];
-      // fprintf (stderr, "alpha k=%d i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof=%g x=%g y=%g delta=%g\n",k,i,t,
-      //       nv.x[], nv.y[], lambda, eta, vof, x, y, Delta);
+      //fprintf (stderr, "alpha k=%g i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof=%g x=%g y=%g delta=%g num=%g\n",k,i,t,
+      //       nv.x[], nv.y[], lambda, eta, vof, x, y, Delta, num);
     }
   }
-
 }
 
 event init (t = 0) {
@@ -123,38 +129,15 @@ event init (t = 0) {
 }
 
 
-scalar airfoilsf[], airfoilsf1[], airfoilsf2[];
-
 event properties (i++) {
   foreach_face()
     muv.x[] = fm.x[]*(U0)*(D)/(Re);
-  //  boundary ((scalar *) {muv});
-
-  /*  
-  foreach()
-    airfoilsf[] = (4.*airfoil[] + 
-		   2.*(airfoil[0,1] + airfoil[0,-1] + airfoil[1,0] + airfoil[-1,0]) +
-		   airfoil[-1,-1] + airfoil[1,-1] + airfoil[1,1] + airfoil[-1,1])/16.;
-
-
-  foreach()
-    airfoilsf1[] = (4.*airfoilsf[] + 
-		   2.*(airfoilsf[0,1] + airfoilsf[0,-1] + airfoilsf[1,0] + airfoilsf[-1,0]) +
-		   airfoilsf[-1,-1] + airfoilsf[1,-1] + airfoilsf[1,1] + airfoilsf[-1,1])/16.;
-
-
-  foreach()
-    airfoilsf2[] = (4.*airfoilsf1[] + 
-		   2.*(airfoilsf1[0,1] + airfoilsf1[0,-1] + airfoilsf1[1,0] + airfoilsf1[-1,0]) +
-		   airfoilsf1[-1,-1] + airfoilsf1[1,-1] + airfoilsf1[1,1] + airfoilsf1[-1,1])/16.;
-  
-  airfoilsf.prolongation = refine_bilinear;
-  airfoilsf.dirty = true; // boundary conditions need to be updated
-  */
+ // boundary ((scalar *) {muv});
 }
 
 
 event logfile (i++){
+
   coord Fp, Fmu;
   interface_force (airfoil, p, u, mu, &Fp, &Fmu);
   double CD = (Fp.x + Fmu.x)/(0.5*sq(U0)*(D));
@@ -172,38 +155,64 @@ event logfile (i++){
       area *= embed_geometryo (point, &b, &n);
       vort = embed_vorticityo (point, u, b, n);
     }
-    // E += area*sq(vort);
+    E += area*sq(vort);
   }
-  
-  fprintf (stderr, "%d %g %d %d %d %d %d %g %g %g\n",
-	   i, t, j, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, CD, CL, E);
+  int counter = 0;
+  double u_avg_x = 0., u_avg_y = 0., p_avg = 0.;
+  foreach()
+    if (airfoil[] == 1) {
+      p_avg += p[];
+      foreach_dimension()
+        u_avg_x += u.x[];
+       counter++;	
+    }
+  u_avg_x /= counter;
+  u_avg_y /= counter;
+  p_avg /= counter;
+
+  fprintf (stderr, "%d %g %d %d %d %d %d %g %g %g %g %g %g\n",
+	   i, t, j, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, u_avg_x, u_avg_y, p_avg, CD, CL, E);
 }
 
 
-event movie (t += 0.01; t <= t_end)
+event movie (t += 0.05; t <= t_end)
 {
-  /*
+
   scalar omega[], m[];
   vorticity (u, omega);
   foreach()
     m[] = 0.5 - airfoil[];
   
  
-  char name1[80];
-  sprintf (name1, "%d-tracers.mp4", j);
-  FILE * fp1 = fopen(name1, "w");
+  char name[80];
+  /*
+  sprintf (name, "%d-tracers.mp4", j);
+  FILE * fp1 = fopen(name, "w");
   output_ppm (f, fp1, n = 500, box = {{0,0},{15,6}},
 	      min = -5, max = 5, linear = false, mask = m, map = cool_warm);
   fclose (fp1);
+*/
+/*
+  sprintf (name, "%d-vort.mp4", j);
+  static FILE * fp2 = fopen(name, "w");
+  output_ppm (omega, fp2, n = 500, box = {{4,2},{15,4}},
+	      min = -5 , max = 5, linear = true, mask = m, map = cool_warm); 
+  // fclose (fp2);
+ */
+  view (fov = 0.75, tx = -0.3325, ty = -0.20,
+		  width = 800, height = 600);
+  clear();
+  draw_vof ("airfoil", "sf", filled = -1, lw = 5);
+  vectors("u", scale = 0.02);
+  squares("u.x", min = -0.05, max = 0.05, map = cool_warm);
+  save ("vinside.mp4");
 
-  char name2[80];
-  sprintf (name2, "%d-vort.mp4", j);
-  FILE * fp2 = fopen(name2, "w");
-  output_ppm (omega, fp2, n = 500, box = {{0,0},{15,6}},
-	      min = -5, max = 5, linear = true, mask = m, map = cool_warm); 
-  fclose (fp2);
-  */
 
+  clear();
+  draw_vof ("airfoil", "sf", filled = -1, lw = 5);
+  vectors("u", scale = 0.02);
+  squares("p", map = cool_warm);
+  save ("0-pinside.mp4");
 }
 
 
@@ -225,7 +234,7 @@ event snapshot (t += 5, t <= t_end)
   foreach_vertex()
     stream[] = (psi[0,-1] + psi[-1,-1]
 		+ psi[] + psi[-1])/4;
-  
+  /*
   char name[80];
   sprintf (name, "%d-dump-%d", j, i);
   dump (file = name);
@@ -255,15 +264,28 @@ event snapshot (t += 5, t <= t_end)
   output_ppm (p, fp3, n = 1000, box = {{0,0},{15,6}},
 	      linear = true, mask = m, map = cool_warm); 
   fclose (fp3);
-
-  char name4[80];
-  sprintf (name4, "%d-stream-lines-%g", j, t);
-  FILE * fp4 = fopen (name4, "w");
+  */
+  char name[80];
+  sprintf (name, "%d-stream-lines-%g", j, t);
+  FILE * fp4 = fopen (name, "w");
   view (fov = 2, tx = -0.375, ty = -0.20,
 	width = 800, height = 400); 
   isoline ("omega", n = 15, min = -3, max = 3);
   draw_vof ("airfoil", "sf", filled = 1, lw = 5);
   save (fp = fp4);
+
+  /*
+  sprintf (name, "%d-vinside-%g", j, t);
+  FILE * fp5 = fopen (name, "w");
+  view (fov = 0.75, tx = -0.3325, ty = -0.20,
+		  width = 800, height = 600);
+  clear();
+  draw_vof ("airfoil", "sf", filled = -1, lw = 5);
+  vectors("u", scale = 0.02);
+  squares("u.x", min = -0.05, max = 0.05, map = cool_warm);
+  save (fp = fp5);
+  */
+
 }
 
 

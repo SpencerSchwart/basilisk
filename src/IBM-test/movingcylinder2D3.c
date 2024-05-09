@@ -106,9 +106,22 @@ event logfile (i++){
     }
     E += area*sq(vort);
   }
+
+int counter = 0;
+  double u_avg_x = 0., u_avg_y = 0.;
+  foreach()
+    if (cs[] == 1) {
+      foreach_dimension()
+        u_avg_x += u.x[];
+       counter++;	
+    }
+  u_avg_x /= counter;
+  u_avg_y /= counter;
+
+
   
-  fprintf (stderr, "%d %g %d %d %d %d %d %g %g %g\n",
-	   i, t, j, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, CD, CL, E);
+  fprintf (stderr, "%d %g %d %d %d %d %d %g %g %g %g %g\n",
+	   i, t, j, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, CD, CL, E, u_avg_x, u_avg_y);
 }
 
 
