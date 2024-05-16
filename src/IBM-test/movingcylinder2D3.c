@@ -1,6 +1,6 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
-//#include "navier-stokes/double-projection.h"
+#include "navier-stokes/double-projection.h"
 #include "curvature.h"
 #include "view.h"
 #include "tracer.h"
@@ -14,7 +14,7 @@ double U0 =  1.0; // inlet velocity
 coord ci = {5, 3}; // initial coordinates of airfoil
 coord vc = {0, 0};
 int j;
-double t_end = 15 [0,1];
+double t_end = 20 [0,1];
 
 scalar f[];
 scalar * tracers = {f};
@@ -40,11 +40,12 @@ int main() {
   size(L0);
   init_grid (2 << (LEVEL-3));
   mu = muv;
+  TOLERANCE = 1.e-5 [*];
 
   j = 0;
-  Re = 1.;
+  Re = 40.;
   run();
-
+/*
   j++;
   Re = 2.;
   run();
@@ -64,13 +65,14 @@ int main() {
   j++;
   Re = 40.;
   run();
+  */
 }
 
 
 event init (t = 0) {
   mask(y > 6 ? top: y < -6 ? bottom : none);
-  solid (cs, fs, sq(x - ci.x) + sq(y - ci.y) - sq(D/2));
   refine (level <= LEVEL*(1. - sqrt(fabs(sq(x-ci.x) + sq(y-ci.y) - sq(D/2.)))/2.));
+  solid (cs, fs, sq(x - ci.x) + sq(y - ci.y) - sq(D/2));
 
   foreach()
     u.x[] = cs[] ? U0 : 0.;
@@ -153,7 +155,7 @@ event movie (t += 0.01; t <= t_end)
 scalar psi[];
 event snapshot (t += 5, t <= t_end)
 {
-  
+ /* 
   scalar omega[];
   vertex scalar stream[];
 
@@ -198,7 +200,7 @@ event snapshot (t += 5, t <= t_end)
   output_ppm (p, fp3, n = 1000, box = {{0,0},{15,6}},
 	      linear = true, mask = m, map = cool_warm); 
   fclose (fp3);
-
+*/
   char name4[80];
   sprintf (name4, "%d-stream-lines-%g", j, t);
   FILE * fp4 = fopen (name4, "w");
@@ -207,12 +209,33 @@ event snapshot (t += 5, t <= t_end)
   isoline ("omega", n = 15, min = -3, max = 3);
   draw_vof ("cs", "fs", filled = -1, lw = 5);
   save (fp = fp4);
+
 }
 
 
 event adapt (i++) {
   adapt_wavelet ({cs,u}, (double[]){1.e-4,3e-4,3e-4},
 		 maxlevel = LEVEL, minlevel = 2);
+}
+
+event profile (t = t_end) {
+  FILE * fv = fopen("vprofy", "w");
+  double delta = 15/(pow(2,LEVEL));
+  int j = 0;
+  for(double i = 0; i <= 6; i+= delta) {
+    foreach_point (5, i) {
+      if (cs[] > 0 && cs[] < 1)
+        j = 2.;
+      else if (cs[] == 0)
+	j = 1.;
+      else
+	j = 0.;
+
+      fprintf (fv, "%d %g %g %g\n", j, x, y, u.x[]);
+    }
+  }
+  fflush (fv);
+  fclose (fv);
 }
 
 

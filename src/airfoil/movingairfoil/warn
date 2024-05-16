@@ -1,7 +1,9 @@
 ./../interfaceforce.h:140: warning: stencils: cannot analyze point function pointers
-.qcc4sLnnw/movingairfoil.c:1:7: warning: line number out of range
+.qccVFNQDH/movingairfoil.c:1:7: warning: line number out of range
 movingairfoil-cpp.c: warning: line number out of range
 <built-in>: warning: line number out of range
 /usr/include/stdc-predef.h:1:7: warning: line number out of range
+movingairfoil.c: In function ‘moving_cylinder’:
+movingairfoil.c:146:14: warning: unused variable ‘vof’ [-Wunused-variable]
 ./../interfaceforce.h: In function ‘interface_force’:
-./../interfaceforce.h:187:1: warning: control reaches end of non-void function [-Wreturn-type]
+./../interfaceforce.h:188:1: warning: control reaches end of non-void function [-Wreturn-type]

@@ -1,45 +1,77 @@
-extern face vector sf; // surface solid volume fraction (0 = empty, 1 = full)
 extern coord vc; // solid velocity
 extern scalar airfoil;
-extern scalar airfoilsf2;
-face vector bf[];
+extern face vector sf;
+vector aF[]; // body force acceleration term
 
-face vector aF[]; // body force acceleration term
-
-
+/*
 event acceleration (i++) {
   foreach_face()
     aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x,0))/(dt);
   a = aF;
 }
+*/
 
 event end_timestep (i++) {
-  foreach_face()
-    aF.x[] = face_value(airfoil,0)*(vc.x-face_value(u.x,0))/(dt);
-  a = aF;
+
+  foreach()
+    foreach_dimension()
+      aF.x[] = airfoil[]*(vc.x-u.x[])/(dt);
+
+  correction(-dt);
+  foreach()
+    foreach_dimension()
+      g.x[] += fm.x[]*aF.x[];
+  correction(dt);
+
 }
 
 
-/*
-void imersed_force (scalar c, coord * F) {
 
-  coord Fi = {0}; // intermediate force
-  vector aC[]; // body force acceleration term (centered)
+
+
+
+
+void normal_vector (scalar s, vector nv) {
+  foreach()
+    foreach_dimension()
+      nv.x[] = (s[1] - s[-1])/(2.*Delta);
 
   foreach() {
+    double mag = 0;
+    foreach_dimension()
+      mag += sq(nv.x[]);
+    mag = sqrt(mag);
+    if (mag > 0)
+      foreach_dimension()
+	nv.x[] /= mag;
+  }
+}
+
+double int_area (Point point, coord * b, coord * n) {
+  *n = facet_normal (point, airfoil, sf);
+  double alpha = plane_alpha (airfoil[], *n);
+  double area = plane_area_center (*n, alpha, b);
+  normalize (n);
+  return area;
+}
+
+
+void immersed_force (scalar c, coord * F) {
+  coord Fi = {0, 0}; // intermediate force
+  vector nv[];
+  // normal_vector (c, nv);
+  foreach() {
     if (c[] > 0. && c[] < 1.) {
-      coord n = interface_normal (point, c), p;
-      double alphaP = plane_alpha (c[], n);
-      double area = pow(Delta, dimension - 1)*plane_area_center (n, alphaP, &p);
-      aC.x[] = (aF.x[] + aF.x[1])/2; // average surface velocity to get center
-      Fi.x += -(aC.x[]*n.x*area)/alpha.x[];
-      aC.y[] = (aF.y[0, 0] + aF.y[0, 1])/2;
-      Fi.y += -(aC.y[]*n.y*area)/alpha.y[];
+      coord n,b;
+      double area = int_area (point, &b, &n);
+      area *= pow (Delta, dimension - 1);
+      double Fn_x = aF.x[]*n.x + aF.y[]*n.x;
+      double Fn_y = aF.x[]*n.y + aF.y[]*n.y;
+      foreach_dimension()
+        Fi.x += (Fn_x*area);
     }
-  }   
+  }
   *F = Fi; 
 }
 
 
-
-*/

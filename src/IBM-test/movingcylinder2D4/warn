@@ -1,0 +1,7 @@
+./../interfaceforce.h:140: warning: stencils: cannot analyze point function pointers
+.qcc958N82/movingcylinder2D4.c:1:7: warning: line number out of range
+movingcylinder2D4-cpp.c: warning: line number out of range
+<built-in>: warning: line number out of range
+/usr/include/stdc-predef.h:1:7: warning: line number out of range
+./../interfaceforce.h: In function ‘interface_force’:
+./../interfaceforce.h:188:1: warning: control reaches end of non-void function [-Wreturn-type]

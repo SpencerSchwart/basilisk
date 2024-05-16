@@ -1,0 +1,27 @@
+main start
+STL is NOT null
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+/home/spencer/basilisk/src/embed.h:257: Assertion `dimension == 2' failed.
+./nptl/pthread_kill.c:44:error: [Thread debugging using libthread_db enabled]
+./nptl/pthread_kill.c:44:error: Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff6f97640 (LWP 11653)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff6796640 (LWP 11654)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff5f95640 (LWP 11655)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff5794640 (LWP 11656)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff4f93640 (LWP 11657)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff4792640 (LWP 11658)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff3f91640 (LWP 11659)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff3790640 (LWP 11660)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff2f8f640 (LWP 11661)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff278e640 (LWP 11662)]
+./nptl/pthread_kill.c:44:error: [New Thread 0x7ffff1f8d640 (LWP 11663)]
+./nptl/pthread_kill.c:44:error: Thread 4 "drone3D-test" received signal SIGABRT, Aborted.
+./nptl/pthread_kill.c:44:error: [Switching to Thread 0x7ffff5f95640 (LWP 11655)]

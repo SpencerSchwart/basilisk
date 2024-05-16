@@ -133,9 +133,9 @@ face vector ab;
 
 event acceleration (i++) {
   output (i, t, 12, dt);
-
-  foreach_face()
-    Af.x[] += fm.x[]*(face_value (u.x, 0) + dt*a.x[]);
+  foreach_face() {
+    Af.x[] = fm.x[]*(face_value (u.x, 0) + dt*a.x[]); // was +=
+  }
 
   /**
   We also add the centered gradient $\mathbf{g^n}$ to the centered
@@ -185,7 +185,9 @@ event end_timestep (i++)
   mgp = project (Af, p, alpha, dt, mgp.nrelax);
   output (i, t, 26, dt);
   delete ((scalar *){Af});
+  // correction (-dt);
   centered_gradient (p, g);
+  // correction (dt);
   output (i, t, 27, dt);
 }
 

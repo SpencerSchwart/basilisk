@@ -40,9 +40,9 @@ int main() {
   mu = muv;
 
   j = 0;
-  Re = 10.;
+  Re = 40.;
   run();
-  
+  /*
   j++;
   Re = 20.;
   run();
@@ -50,6 +50,7 @@ int main() {
   j++;
   Re = 40.;
   run();
+  */
 }
 
 

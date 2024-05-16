@@ -1,0 +1,9 @@
+./../interfaceforce.h:140: warning: stencils: cannot analyze point function pointers
+.qccNtzZAT/cylinder9.c:1:7: warning: line number out of range
+cylinder9-cpp.c: warning: line number out of range
+<built-in>: warning: line number out of range
+/usr/include/stdc-predef.h:1:7: warning: line number out of range
+cylinder9.c: In function ‘profile’:
+cylinder9.c:219:21: warning: format ‘%g’ expects a matching ‘double’ argument [-Wformat=]
+./../interfaceforce.h: In function ‘interface_force’:
+./../interfaceforce.h:188:1: warning: control reaches end of non-void function [-Wreturn-type]

@@ -1,5 +1,5 @@
-#ifndef BASILISK_HEADER_24
-#define BASILISK_HEADER_24
+#ifndef BASILISK_HEADER_22
+#define BASILISK_HEADER_22
 #line 1 "./../interfaceforce.h"
 extern scalar airfoil;
 extern face vector sf;
@@ -192,7 +192,7 @@ double interface_force (scalar c, scalar p, vector u,
 
 double embed_vorticityo (Point point, vector u, coord p, coord n)
 {
-  coord dudn = embed_gradient (point, u, p, n);
+  coord dudn = embed_gradiento (point, u, p, n);
 
   return dudn.y*n.x - dudn.x*n.y;
 }

@@ -84,14 +84,27 @@ bool stokes = false;
 extern double xi, yi;
 
 void output(int i, double t, int j, double dt) {
+/*
+  foreach() {
+    if (x > xi*0.999 && x < xi*1.001 && y > yi*0.999 && y < yi*1.001)
+	    
+      fprintf (stderr, "i=%d t=%g j=%d vof=%g u.x=%g u.y=%g uf.x=%g uf.y=%g p=%g g.x=%g g.y= %g a.x=%g a.y=%g aF.x=%g aF.y=%g Af.x=%g Af.y=%g dp=%g ab.x=%g ab.y=%g u.x face = %g, u.y face = %g\n",
+		      i, t, j, airfoil[], u.x[], u.y[], uf.x[], uf.y[], p[], g.x[], g.y[],
+		      dt*a.x[], dt*a.y[], aF.x[], aF.y[], Af.x[], Af.y[], dp[], ab.x[], ab.y[], face_value(u.x,0), face_value(u.y,0));
+		      
+  }
+  */
 	/*
   foreach() {
     if (x > xi*0.999 && x < xi*1.001 && y > yi*0.999 && y < yi*1.001)
-      fprintf (stderr, "i=%d t=%g j=%d vof=%g u.x=%g u.y=%g uf.x=%g uf.y=%g p=%g g.x=%g g.y= %g a.x=%g a.y=%g aF.x=%g aF.y=%g Af.x=%g Af.y=%g dp=%g ab.x=%g ab.y=%g\n",
+	    
+      fprintf (stderr, "i=%d t=%g j=%d vof=%g u.x=%g u.y=%g uf.x=%g uf.y=%g p=%g g.x=%g g.y= %g a.x=%g a.y=%g aF.x=%g aF.y=%g u.x face = %g, u.y face = %g\n",
 		      i, t, j, airfoil[], u.x[], u.y[], uf.x[], uf.y[], p[], g.x[], g.y[],
-		      a.x[], a.y[], aF.x[], aF.y[], Af.x[], Af.y[], dp[], ab.x[], ab.y[]);
+		      dt*a.x[], dt*a.y[], aF.x[], aF.y[], face_value(u.x,0), face_value(u.y,0));
+		      
   }
   */
+
 }
 
 /**

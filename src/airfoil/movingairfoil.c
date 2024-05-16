@@ -1,6 +1,7 @@
 #include "embed.h"
+#undef EMBED
 #include "navier-stokes/centered.h"
-#include "navier-stokes/double-projection.h"
+// #include "navier-stokes/double-projection.h"
 #include "../immersed.h" // IBM
 #include "../interfaceforce.h" // for CD and CL
 #include "curvature.h"
@@ -9,27 +10,23 @@
 #define MAX_THICKNESS 0.12
 #define CHORD_LENGTH 1
 #define L0 20.
-#define Re (6000000.)
+#define Re (2000.)
 #define LEVEL 12
 
 double U0 =  1.0; // inlet velocity
 double rr = 1.1019*sq(MAX_THICKNESS); // Radius of leading edge
-double theta_p = 0.0872665; // aoa = 5 degrees
+// double theta_p = 0.0872665; // aoa = 5 degrees
+double theta_p = 0.34906585; // aoa = 20 degrees
 
 coord vc = {0.,0.}; // the velocity of the cylinder
 coord ci = {5, 10}; // initial coordinates of airfoil
 coord cr = {0.25*(CHORD_LENGTH), 0.}; // center of rotation
 
+int j;
+
 scalar airfoil[];
 face vector sf[];
 face vector muv[];
-
-
-double xo = 4.7583;
-double yo = 10.0366;
-double xi = 4.76318+(0.004883*0);
-double yi = 10.0366;
-
 
 u.n[left] = dirichlet ((U0));
 u.t[left] = dirichlet (0);
@@ -50,16 +47,11 @@ u.n[bottom] = neumann (0);
 						   +(0.2843*(cube(x)))	\
 						   -(0.1036*(pow(x, 4.)))))
 
-#define naca00xx(x,y,a) (x >= 0:-sq (y) + sq (5.*(a)*(0.2969*sqrt   ((x)) \
-						      - 0.1260*((x))	\
-						      - 0.3516*sq   ((x)) \
-						      + 0.2843*cube ((x)) \
-						      - 0.1036*pow  ((x), 4.))): 0) // -0.1015 or -0.1036
 
-void airfoil_shape (scalar c, face vector f, double theta)
+void airfoil_shape (scalar c, face vector f, double theta, vertex scalar phii = {0})
 {
   double yt, yc = 0;
-  vertex scalar phi[];
+  vertex scalar phi = automatic (phii);
   
   double chord = CHORD_LENGTH;
   
@@ -79,7 +71,7 @@ void airfoil_shape (scalar c, face vector f, double theta)
       phi[] = YY > yc? - sq(YY) + sq(yt): - sq(YY) + sq(yt);
     }
     else
-      phi[] = 0.;
+      phi[] = -1.;
   } 
   boundary ({phi});
   fractions (phi, c, f);
@@ -88,10 +80,34 @@ void airfoil_shape (scalar c, face vector f, double theta)
 }
 
 
+double SDF (double xx, double yy) {
+  double XX = cr.x + (xx - ci.x)*cos (theta_p) - (yy - ci.y)*sin (theta_p);
+  double YY = cr.y + (xx - ci.x)*sin (theta_p) + (yy - ci.y)*cos (theta_p);
+
+  if (XX < 0) {
+      // leading edge approximation
+      return - sq(XX-rr) - sq(YY) + sq(rr);
+    }
+  else if (XX >= 0. && XX <= CHORD_LENGTH) {
+      // basic airfoil thickness
+      double yt = airfoil_thickness(XX);
+      return YY > 0? - sq(YY) + sq(yt): - sq(YY) + sq(yt);
+    }
+  else
+      return -1.;
+}	
+
+
 int main(){
   size(L0);
   init_grid (2 << (LEVEL-4));
   mu = muv;
+  TOLERANCE = 1.e-8 [*];
+
+  j = 0; // SPM
+  run();
+
+  j = 1; // No SPM
   run();
 }
 
@@ -109,10 +125,32 @@ event init (t = 0) {
   airfoil_shape(airfoil, sf, theta_p);
 }
 
+scalar ref[];
+face vector rf[];
+vertex scalar phia[];
+vector nv[];
 
 event moving_cylinder (i++) {
-  airfoil_shape (airfoil, sf, theta_p);
+  airfoil_shape (airfoil, sf, theta_p, phia);
+  airfoil_shape (ref, rf, theta_p);
+  
+  if (j == 0) { // SPM
+  normal_vector(ref, nv);
+
+  foreach() {
+      double lambda = fabs(nv.x[]) + fabs(nv.y[]);
+      double eta = 0.065*(1 - sq(lambda)) + 0.39;
+      double num = - SDF (x,y);
+      double den = lambda * eta * sqrt(2) * Delta;
+      double scale = 12;
+      double vof = airfoil[];
+      airfoil[] = den != 0? 0.5*(1 - tanh ((num/den)*scale)):airfoil[];
+      // fprintf (stderr, "i=%d t=%g n.x=%g n.y=%g lam=%g eta=%g vof_b=%g vof_a=%g x=%g y=%g delta=%g num=%g den=%g tanh(%g)\n",
+// 		      i, t, nv.x[], nv.y[], lambda, eta, vof, airfoil[], x, y, Delta, num, den, (num/den)*scale);
+    }
+  }
 }
+
 
 event properties (i++) {
   foreach_face()
@@ -127,16 +165,10 @@ event logfile (i++; t <= 15){
   interface_force (airfoil, p, u, mu, &Fp, &Fmu);
   double CD = (Fp.x + Fmu.x)/(0.5*sq(U0)*(CHORD_LENGTH));
   double CL = (Fp.y + Fmu.y)/(0.5*sq(U0)*(CHORD_LENGTH));
-  int counter = 0;
-  foreach()
-    if((x >= 4.76318*0.9999 && x <= 4.76318 * 1.0001) && (y >= 10.0366*0.9999 && y <= 10.0366*1.0001))
-      counter += 1;
-  
-  fprintf (stderr, "%d %g %d %d %d %d %g %g %d\n",
-	   i, t, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, CD, CL, counter);
+  fprintf (stderr, "%d %g %d %d %d %d %d %g %g\n",
+	   i, t, j, mgp.i, mgp.nrelax, mgu.i, mgu.nrelax, CD, CL);
   
 }
-
 
 /*
 event movie (t += 1e-2; t <= 10)
@@ -154,33 +186,18 @@ event movie (t += 1e-2; t <= 10)
 }
 */
 
-#if DUMP
-event snapshot (t += 1e-1; t <= 5)
-{
-  char name[80];
-  sprintf (name, "dump-%d", i);
-  dump (file = name);
+event screenshot (t += 0.5; t <= 15) {
+  view (fov =2, camera = "front", 
+        tx = -0.25, ty = -0.5, bg = {1,1,1},
+	width = 3200, height = 3200);
+  clear();
+  draw_vof ("ref", "rf", filled = 1, lw = 3);
+  isoline ("p", n = 80, min = -1, max = 1);
+  if (j == 0)
+    save("piso-0.png");
+  else // j == 1
+    save("piso-1.png");
 }
-#endif
-
-event coordinates (t=0.1) {
-  char name[80];
-  char name1[80];
-  sprintf (name, "out-%g", t);
-  sprintf (name1, "out-facets");
-  FILE * fp = fopen (name, "w");
-  FILE * fp1 = fopen (name1, "w");
-  foreach() {
-    if (airfoil[] > 0 && airfoil[] < 1)
-      fprintf (fp, "%g %g\n", x, y);
-  }
-  fprintf (fp, "\n");
-  fclose (fp);
-  output_facets (airfoil, fp1, sf);
-  fclose (fp1);
-
-}
-
 
 event adapt (i++) {
   adapt_wavelet ({airfoil,u}, (double[]){1.e-4,3e-4,3e-4},

@@ -1,4 +1,0 @@
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-[Detaching after vfork from child process 4891]
-[Detaching after vfork from child process 4899]
